@@ -7,6 +7,7 @@ authors = ["BrunoGrifo <<>>"]
 [tool.poetry.dependencies]
 python = "^3.8"
 discord = "^1.7.3"
+jokepy = "^1.0.3"
 
 [tool.poetry.dev-dependencies]
 
