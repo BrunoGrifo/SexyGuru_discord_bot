@@ -1,9 +1,13 @@
 import os
+import string
 import json
 import random
 import discord
 import requests
 from jokepy import Jokepy
+import urllib
+
+from flask_code import keep_alive
 
 client = discord.Client()
 
@@ -17,7 +21,19 @@ bad_words_lecture = [
 "Xô Satanás! Vai dizer palavrões para longe!",
 "Pai nosso que estás no céu perdoai este pecador pois ele não sabe falai em condições e livrai-lhe de todos os palavrões, amén."
 ]
-
+						
+def loginSpotify():
+	base_url =  "https://accounts.spotify.com/authorize?"
+	url_par = {
+		'client_id':  os.environ['SPOTIFY_CLIENT_ID'],
+		'response_type': 'code',
+		'redirect_uri': 'http://localhost:8888/callback/' ,
+		'state':  ''.join(random.choices(string.ascii_lowercase + string.digits, k = 16)),
+		'scope': 'playlist-modify-public'
+	}
+	response = requests.get(base_url + urllib.parse.urlencode(url_par))
+	return response.json()
+	
 def get_joke():
 	j = Jokepy(categories=['Dark'])  # Initialise the class
 	return j.get_joke()
@@ -55,5 +71,5 @@ async def on_message(message):
 
 
 
-
+keep_alive()
 client.run(os.environ['TOKEN'])
