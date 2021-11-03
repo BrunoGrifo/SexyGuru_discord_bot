@@ -6,10 +6,15 @@ import discord
 import requests
 from jokepy import Jokepy
 import urllib
+from discord.ext import commands
+
 
 from flask_code import keep_alive
+from flask_code import spotify_playlist
 
-client = discord.Client()
+
+
+bot = commands.Bot(command_prefix='/')
 
 bad_words = ["fdx", "foda-se", "crlh", "caralho", "puta", "merda", "putedo", "cona", "paneleiro", "foder", "porra", "cabrão", "cabrao", "badalhoco", "badalhoca", "anormal", "rabeta", "xupa", "xupa-mos", "porca", "rabilas", "merdoso", "fufa", "caralhinho", "punheta", "canalha", "bicha", "bichona"]
 
@@ -48,28 +53,31 @@ def get_fact():
 	json_data = json.loads(response.text)
 	return json_data['text']
 
-@client.event
+@bot.event
 async def on_ready():
-	print("We are live as {}".format(client.user))
+	print("We are live as {}".format(bot.user))
 
-@client.event
+@bot.event
 async def on_message(message):
-	if message.author == client:
-		return
-
-	if message.content.startswith("/hello"):
-		await message.channel.send('Hello {}\n{}'.format(message.author.name, get_compliment()))
-	
-	if message.content.startswith("/guru"):
-		await message.channel.send(get_fact())
-
 	if any(word.lower() in message.content for word in bad_words):
-		await message.channel.send(random.choice(bad_words_lecture))
+			await message.channel.send(random.choice(bad_words_lecture))
+	await bot.process_commands(message)
 
+@bot.command(name = "test")
+async def test(ctx, *args):
+	 await ctx.send('{} arguments: {}'.format(len(args), ', '.join(args)))
+
+@bot.command(name = "hello")
+async def hello(ctx):
+	 await ctx.send('Hello {}\n{}'.format(ctx.author.name, get_compliment()))
+
+@bot.command(name = "guru")
+async def guru(ctx):
+	 await ctx.send(get_fact())
 
 
 
 
 
 keep_alive()
-client.run(os.environ['TOKEN'])
+bot.run(os.environ['TOKEN'])
