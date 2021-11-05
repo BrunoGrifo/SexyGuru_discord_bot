@@ -11,6 +11,7 @@ from discord.ext import commands
 
 from flask_code import keep_alive
 from flask_code import spotify_playlist
+from flask_code import spotify_search
 
 
 
@@ -26,6 +27,21 @@ bad_words_lecture = [
 "Xô Satanás! Vai dizer palavrões para longe!",
 "Pai nosso que estás no céu perdoai este pecador pois ele não sabe falai em condições e livrai-lhe de todos os palavrões, amén."
 ]
+
+search_guide = """
+>>> **Search Guide**
+
+- /search album <album_input>
+
+- /search artist <artist_input>
+
+- /search track <track_input> | <track_input>,<artist_input>
+"""
+
+invalid_command = """```diff
+- Warning! Invalid command.
+```
+"""
 						
 def loginSpotify():
 	base_url =  "https://accounts.spotify.com/authorize?"
@@ -63,20 +79,62 @@ async def on_message(message):
 			await message.channel.send(random.choice(bad_words_lecture))
 	await bot.process_commands(message)
 
-@bot.command(name = "test")
-async def test(ctx, *args):
-	 await ctx.send('{} arguments: {}'.format(len(args), ', '.join(args)))
 
 @bot.command(name = "hello")
 async def hello(ctx):
-	 await ctx.send('Hello {}\n{}'.format(ctx.author.name, get_compliment()))
+	 	await ctx.send('Hello {}\n{}'.format(ctx.author.name, get_compliment()))
+
 
 @bot.command(name = "guru")
 async def guru(ctx):
-	 await ctx.send(get_fact())
+		await ctx.send(get_fact())
+
+@bot.command(name = "test")
+async def test(ctx):
+		await ctx.send("""```diff
+- Warning! Invalid command.
+```
+""")	
+		await ctx.send("""
+>>> **Titulo**
+Line 1
+Line 2
+""")
+
+@bot.command(name = "playlist")
+async def playlist(ctx):
+		response = spotify_playlist()
+		print(response['external_urls']['spotify'])
+		await ctx.send(response['external_urls']['spotify'])
 
 
+@bot.command(name = "search")
+async def search(ctx, *args):
+		if len(args) < 2:
+			await ctx.send(search_guide)
+		elif args[0].lower() not in ["album", "artist", "track"]:
+			await ctx.send(invalid_command)
+			await ctx.send(search_guide)
+		elif args[0].lower() == "track":
+			result = spotify_search(args[0], " ".join(args[1:]))
+			if not result or not result["tracks"]:
+				await ctx.send("There are no tracks with that name!")
+			dict_search_for(result["tracks"]["items"])
+			await ctx.send(dict_search_for(result["tracks"]["items"]))
 
+		#response = spotify_playlist()
+		#await ctx.send(response['external_urls']['spotify'])
+		else:
+			await ctx.send("testing...")
+		
+
+def dict_search_for(json_dict):
+	songs_list = ""
+	for obj in json_dict:
+		songs_list += "ID:{} \n{}\n\n".format(obj["id"], obj["external_urls"]["spotify"])
+	
+	search_guide = """>>> **Tracks** \n{}""".format(songs_list)
+	return search_guide
 
 
 keep_alive()
