@@ -67,3 +67,14 @@ def get_search(auth_header, arg1, arg2):
 		resp = requests.get(url, headers=auth_header)
 		return resp.json()
 
+def add_track(auth_header, arg, playlist):
+	url = "{}/{}/{}/{}/{}".format(SPOTIFY_API_BASE_URL, 'v1', 'playlists', playlist , "tracks")
+	code_payload = {
+			"uris": ["spotify:track:" + x for x in arg.split(",")],
+			"position": 0
+	}
+	auth_header["Content-Type"] = 'application/json'
+	post_request = requests.post(url, data=json.dumps(code_payload), headers=dict(auth_header))
+	response_data = json.loads(post_request.text)
+	print(response_data)
+	return "Track added to playlist!"

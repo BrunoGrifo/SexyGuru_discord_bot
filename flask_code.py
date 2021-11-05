@@ -17,6 +17,7 @@ from spotify import auth_url
 from spotify import authorize
 from spotify import get_playlist
 from spotify import get_search
+from spotify import add_track
 
 from replit import db
 
@@ -44,10 +45,14 @@ def spotify_playlist():
 	return result
 
 def spotify_search(arg1, arg2):
+	refresh_token()
 	result = get_search(db['auth_header'], arg1, arg2)
-	#refresh_token(db['auth_header'])
 	return result
 
+def	spotify_add_track(arg):
+	refresh_token()
+	result = add_track(db['auth_header'], arg, "3ZG0ZD5d6pMNKvhf6sfGHj")
+	return result
 
 def refresh_token():
 	base64encoded = base64.b64encode(("{}:{}".format(os.environ['SPOTIFY_CLIENT_ID'], os.environ['SPOTIFY_CLIENT_SECRET'])).encode())

@@ -12,6 +12,7 @@ from discord.ext import commands
 from flask_code import keep_alive
 from flask_code import spotify_playlist
 from flask_code import spotify_search
+from flask_code import spotify_add_track
 
 
 
@@ -89,23 +90,18 @@ async def hello(ctx):
 async def guru(ctx):
 		await ctx.send(get_fact())
 
-@bot.command(name = "test")
-async def test(ctx):
-		await ctx.send("""```diff
-- Warning! Invalid command.
-```
-""")	
-		await ctx.send("""
->>> **Titulo**
-Line 1
-Line 2
-""")
 
 @bot.command(name = "playlist")
 async def playlist(ctx):
 		response = spotify_playlist()
 		print(response['external_urls']['spotify'])
 		await ctx.send(response['external_urls']['spotify'])
+
+
+@bot.command(name = "add")
+async def add(ctx, arg):
+		response = spotify_add_track(arg)
+		await ctx.send(response)
 
 
 @bot.command(name = "search")
