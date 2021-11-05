@@ -5,6 +5,7 @@ import string
 import requests
 import urllib
 import base64
+from replit import db
 
 # spotify endpoints
 SPOTIFY_AUTH_BASE_URL = "https://accounts.spotify.com"
@@ -43,6 +44,8 @@ def authorize(auth_token):
 		# tokens are returned to the app
 		response_data = json.loads(post_request.text)
 		access_token = response_data["access_token"]
+
+		db["refresh_token"] = response_data["refresh_token"]
 
 			# use the access token to access Spotify API
 		auth_header = {"Authorization": "Bearer {}".format(access_token)}
