@@ -29,6 +29,13 @@ bad_words_lecture = [
 "Pai nosso que estás no céu perdoai este pecador pois ele não sabe falai em condições e livrai-lhe de todos os palavrões, amén."
 ]
 
+add_guide = """
+>>> **Add Track Guide**
+
+- /add <track_id>
+
+"""
+
 search_guide = """
 >>> **Search Guide**
 
@@ -84,6 +91,11 @@ async def on_message(message):
 @bot.command(name = "hello")
 async def hello(ctx):
 	 	await ctx.send('Hello {}\n{}'.format(ctx.author.name, get_compliment()))
+
+@bot.command(name = "commands")
+async def commands(ctx):
+		await ctx.send(add_guide)
+		await ctx.send(search_guide)
 
 
 @bot.command(name = "guru")
