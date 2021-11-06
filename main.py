@@ -84,8 +84,22 @@ async def on_ready():
 @bot.event
 async def on_message(message):
 	if any(word.lower() in message.content for word in bad_words):
-			await message.channel.send(random.choice(bad_words_lecture))
+		result = get_heart_string(message.content)
+		await message.channel.send(result)
+		await message.channel.send(random.choice(bad_words_lecture))
 	await bot.process_commands(message)
+
+def get_heart_string(string):
+	words = string.replace(",", "").split(" ")
+	new = []
+	for i, word in enumerate(words):
+		if word in bad_words:
+			new.append(len(word)*"\u2665")
+		else:
+			new.append(word)
+	result = " ".join(word for word in new)	
+	print(result)
+	return result
 
 
 @bot.command(name = "hello")
