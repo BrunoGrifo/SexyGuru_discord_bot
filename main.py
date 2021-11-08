@@ -3,6 +3,7 @@ import string
 import json
 import random
 import discord
+import re
 import requests
 from jokepy import Jokepy
 import urllib
@@ -13,12 +14,13 @@ from flask_code import keep_alive
 from flask_code import spotify_playlist
 from flask_code import spotify_search
 from flask_code import spotify_add_track
+from flask_code import spotify_remove_track
 
 
 
 bot = commands.Bot(command_prefix='/')
 
-bad_words = ["fdx", "foda-se", "crlh", "caralho", "puta", "merda", "putedo", "cona", "paneleiro", "foder", "porra", "cabrão", "cabrao", "badalhoco", "badalhoca", "anormal", "rabeta", "xupa", "xupa-mos", "porca", "rabilas", "merdoso", "fufa", "caralhinho", "punheta", "canalha", "bicha", "bichona"]
+bad_words = ["fdx", "foda-se", "crlh", "caralho", "puta", "merda", "putedo", "cona", "paneleiro", "foder", "porra", "cabrão", "cabrao", "badalhoco", "badalhoca", "anormal", "rabeta", "xupa", "xupa-mos", "porca", "rabilas", "merdoso", "fufa", "caralhinho", "punheta", "canalha", "bicha", "bichona", "putinha", "putedo", "putona", "fucking"]
 
 bad_words_lecture = [
 "Fala bem que já tens dentes!", 
@@ -28,6 +30,17 @@ bad_words_lecture = [
 "Xô Satanás! Vai dizer palavrões para longe!",
 "Pai nosso que estás no céu perdoai este pecador pois ele não sabe falai em condições e livrai-lhe de todos os palavrões, amén."
 ]
+
+facts_guide = """
+>>> **Simple commands Guides**
+
+- /hello :Returns a compliment
+
+- /guru :Returns a random and sometimes useless worldwide fact
+
+- /commands :Returns all the availables commands on the server
+
+"""
 
 add_guide = """
 >>> **Add Track Guide**
@@ -81,16 +94,21 @@ def get_fact():
 async def on_ready():
 	print("We are live as {}".format(bot.user))
 
+
 @bot.event
 async def on_message(message):
-	if any(word.lower() in message.content for word in bad_words):
-		result = get_heart_string(message.content)
-		await message.channel.send(result)
+	if any(word in message.content.lower() for word in bad_words):
+		result = get_heart_string(message.content.lower())
+		print(result)
+		await message.delete()
+		await message.channel.send("{}: '{}'".format(message.author.name, result))
 		await message.channel.send(random.choice(bad_words_lecture))
+		#await message.channel.send("Stop with the bad language or I will call your mom!")
 	await bot.process_commands(message)
 
 def get_heart_string(string):
-	words = string.replace(",", "").split(" ")
+	words = re.sub('[^A-Za-z]+', ' ', string).split(" ")
+	print(words)
 	new = []
 	for i, word in enumerate(words):
 		if word in bad_words:
@@ -98,7 +116,6 @@ def get_heart_string(string):
 		else:
 			new.append(word)
 	result = " ".join(word for word in new)	
-	print(result)
 	return result
 
 
@@ -110,6 +127,7 @@ async def hello(ctx):
 async def commands(ctx):
 		await ctx.send(add_guide)
 		await ctx.send(search_guide)
+		await ctx.send(facts_guide)
 
 
 @bot.command(name = "guru")
@@ -127,6 +145,11 @@ async def playlist(ctx):
 @bot.command(name = "add")
 async def add(ctx, arg):
 		response = spotify_add_track(arg)
+		await ctx.send(response)
+
+@bot.command(name = "remove")
+async def remove(ctx, arg):
+		response = spotify_remove_track(arg)
 		await ctx.send(response)
 
 

@@ -18,6 +18,7 @@ from spotify import authorize
 from spotify import get_playlist
 from spotify import get_search
 from spotify import add_track
+from spotify import remove_track
 
 from replit import db
 
@@ -52,6 +53,11 @@ def spotify_search(arg1, arg2):
 def	spotify_add_track(arg):
 	refresh_token()
 	result = add_track(db['auth_header'], arg, "3ZG0ZD5d6pMNKvhf6sfGHj")
+	return result
+
+def	spotify_remove_track(arg):
+	refresh_token()
+	result = remove_track(db['auth_header'], arg, "3ZG0ZD5d6pMNKvhf6sfGHj")
 	return result
 
 def refresh_token():
